@@ -14,7 +14,6 @@ import 'firebase/auth';
 import 'firebase/database';
 import 'firebase/storage';
 
-// import ModalExampleSize from './components/popup'
 
 var firebaseConfig2 = {
   apiKey: "AIzaSyBMwRNcspFOzmhV07bDMkmSsJFNPzFMaFQ",
@@ -26,14 +25,19 @@ var firebaseConfig2 = {
   appId: "1:517086250675:web:fcb781e45d75307ce0d2c6",
   measurementId: "G-8MP0SGS15E"
 };
-// if(!firebase.app.length){}
-const app3 = firebase.initializeApp(firebaseConfig2, 'app3');
+var app3;
+if (!firebase.apps.length) {
+   app3= firebase.initializeApp(firebaseConfig2,'app3');
+}else {
+   firebase.app(); // if already initialized, use that one
+}
+// const app3 = firebase.initializeApp(firebaseConfig2, 'app3');
 
 var database3 = firebase.database(app3);
 
 
-
-class App extends Component {
+console.log("ssssss");
+class App extends Component { 
   constructor(){
     super()
     this.state = {
