@@ -1,35 +1,16 @@
 import './App.css';
 import React,{Component} from 'react';
-import firebase from 'firebase/app';
+import firebase from '../firebaseConnection';
 import { Link } from 'react-router-dom';
-import logo from './images/dvaraLogo.jpg';
-import deleteimag from './images/deleteLogo1.png';
+import deleteimag from '../images/deleteLogo1.png';
 import { Grid, Select , Input, Dropdown , Form , Button , Modal , Icon} from 'semantic-ui-react'
 import ReactTable from 'react-table-v6'
 import { Events, animateScroll as scroll, scroller } from 'react-scroll';
 
 import 'react-table-v6/react-table.css';
+import TopHeader from './TopHeader';
 
-import 'firebase/auth';
-import 'firebase/database';
-import 'firebase/storage';
-
-// import ModalExampleSize from './components/popup'
-
-var firebaseConfig2 = {
-  apiKey: "AIzaSyBMwRNcspFOzmhV07bDMkmSsJFNPzFMaFQ",
-  authDomain: "dvara-third.firebaseapp.com",
-  databaseURL: "https://dvara-third-default-rtdb.firebaseio.com",
-  projectId: "dvara-third",
-  storageBucket: "dvara-third.appspot.com",
-  messagingSenderId: "517086250675",
-  appId: "1:517086250675:web:fcb781e45d75307ce0d2c6",
-  measurementId: "G-8MP0SGS15E"
-};
-// if(!firebase.app.length){}
-const app3 = firebase.initializeApp(firebaseConfig2, 'app3');
-
-var database3 = firebase.database(app3);
+var database3 = firebase.database();
 
 
 class App extends Component { 
@@ -252,16 +233,7 @@ class App extends Component {
       ];
     return (
       <div style={{backgroundColor:'#eee'}}>
-        <div className = "headerContainer">
-            <div className = "headerWrapper" >
-                <div className = "dvaraLogoImgWrapper">
-                    <img className = "dvaraLogoImg"src = {logo} alt = "DvaraLogo"/>
-                </div>
-            </div>
-            <div className = "headerCustomTitleWrapper">
-              <div className = "headerCustomTitle">DVARA E-DAIRY USER MANAGEMENT DASHBOARD</div>
-            </div>
-        </div>
+        <TopHeader/>
         <div  style={{margin:"1% 0% 2% 40%"}}>
           <Dropdown
             placeholder='Select Database'
