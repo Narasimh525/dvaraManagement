@@ -53,7 +53,8 @@ class App extends Component {
       dataAdded:false,
       showUsersSelected:false,
       addUserSelected:false,
-      databaseOptions:[]
+      databaseOptions:[],
+      mobileValidation:false
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleChange1 = this.handleChange1.bind(this)
@@ -84,16 +85,26 @@ class App extends Component {
   }
   handleChange(event){
     let {name , value} = event.target;
-    this.setState({ [name]: value})
+    if(name.includes("mobile")){
+      this.setState({[name]: value},()=>{
+
+      if(value.length>10 || this.state.mobile1.length>10)
+        this.setState({mobileValidation:true})
+      else
+        this.setState({mobileValidation:false})
+        })
+      }
+    else{
+      this.setState({ [name]: value})
+    }
   }
   handleChange1 = (e, { name, value }) => 
-    {this.setState({ [name]: value})
-    // this.displayUsers()
+    {var database=this.state.database;console.log(database);;this.setState({ [name]: value},()=>{if(database) this.displayUsers(false)}) 
   }
   handleSubmit = (e) =>{
     e.preventDefault();
     console.log(this.state);
-    if(this.state.name1 && this.state.mobile1 && this.state.database){
+    if(this.state.name1 && this.state.mobile1 && this.state.database && !this.state.mobileValidation){
       var data ={
         [this.state.name1]: "+91"+this.state.mobile1,
       }
@@ -111,10 +122,10 @@ class App extends Component {
       setTimeout(()=>{this.setState({addUserSelected:false})},1500)
     }
   }
-  displayUsers(){
+  displayUsers(showUsers){
     if(this.state.database)
     {
-      this.setState({showUsers:!this.state.showUsers})
+      if(showUsers) this.setState({showUsers:!this.state.showUsers})
       var database;
       this.state.databases[this.state.database].ref('/').on("value", (snap) => {
         const data = snap.val();
@@ -123,20 +134,7 @@ class App extends Component {
         var restrictUserKeys = Object.keys(restrictUser)
         var arr = []
         restrictUserKeys.forEach(item => {
-          var User = Users[restrictUser[item]]
-          if(User){
-            var totalInsemination=0;
-            if(Object.keys(User).includes('dashboard')){
-              var dates = Object.keys(User['dashboard'])
-              for(let i=dates.length-1;i>0&& (i+4)!=dates.length;i--){
-                totalInsemination = totalInsemination+Number(User['dashboard'][dates[i]])
-              }
-            }
-            arr.push({"Name":item,"MobileNumber":restrictUser[item],"totalInsemination":totalInsemination})
-          }
-          else{
-            arr.push({"Name":item,"MobileNumber":restrictUser[item],"totalInsemination":0})
-          }
+            arr.push({"Name":item,"MobileNumber":restrictUser[item]})
         })
         this.setState({userDerails:arr},()=>{console.log(this.state.userDerails);})
       })
@@ -178,14 +176,26 @@ class App extends Component {
               placeholder='Name'
               onChange={this.handleChange}
             />
-            <Form.Input
+            {/* <Form.Input
               fluid
+              // type='number'
+              pattern="[789][0-9]{9}"
               id='form-subcomponent-shorthand-input-last-name'
               label='Mobile Number'
               placeholder='Mobile Number'
               name={"mobile"+item}
               onChange={this.handleChange}
-            />
+            /> */}
+            <Form.Field>
+              <label>Mobile Number</label>
+              <Input 
+                label='+91' 
+                type="number"
+                id='form-subcomponent-shorthand-input-last-name'
+                placeholder='Mobile Number' 
+                name={"mobile"+item}
+                onChange={this.handleChange} />
+            </Form.Field>
           </Form.Group>
       )
       const columns = [
@@ -210,21 +220,6 @@ class App extends Component {
           Header: 'Mobile Number',
           accessor: 'MobileNumber',
           filterople: true,
-          headerStyle: {
-            background:"#57b8ff",
-            textAlign:'center',
-            color: '#060806',
-            fontSize:'16px',
-            fontFamily:"Times, Times New Roman, serif",
-            borderRadius: '1px',
-            padding: '5px',
-            border:'1px solid #133314',
-        },
-        },
-        {
-          Header: 'Total Inseminations',
-          accessor: 'totalInsemination',
-          id: 'totalInsemination',
           headerStyle: {
             background:"#57b8ff",
             textAlign:'center',
@@ -280,6 +275,10 @@ class App extends Component {
         </div>
         <Form style={{marginLeft:"30%"}} onSubmit={this.handleSubmit}>
           {inputs}
+          { this.state.mobileValidation ?
+            <p style={{marginLeft:"14%",color:"red"}}>Mobile Number is Not Valid</p>
+            :null
+          }
           { this.state.dataAdded ?
             <p style={{marginLeft:"14%",color:"green"}}>Users added successfully....!</p>
             :null
@@ -304,7 +303,7 @@ class App extends Component {
               <p style={{color:"red"}}>Please Select a Project....!</p>
               :null
           }
-          {this.state.showUsers? <Button primary onClick={()=>{this.displayUsers(false)}}>Show Users</Button> : <Button color='teal' onClick={()=>{this.hideUsers()}}>Hide Users</Button>}
+          {this.state.showUsers? <Button primary onClick={()=>{this.displayUsers(true)}}>Show Users</Button> : <Button color='teal' onClick={()=>{this.hideUsers()}}>Hide Users</Button>}
         </div>
         <div name = 'grid-scroll'></div> 
         {!this.state.showUsers?
