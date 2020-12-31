@@ -29,13 +29,15 @@ class App extends Component {
       mobile5:"",
       database:"",
       databases:{},
+      databasePaths:{},
       showUsers:true,
       userDerails:[],
       dataAdded:false,
       showUsersSelected:false,
       addUserSelected:false,
       databaseOptions:[],
-      mobileValidation:false
+      mobileValidation:false,
+      jsonFormatChange:false,
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleChange1 = this.handleChange1.bind(this)
@@ -46,11 +48,29 @@ class App extends Component {
       var initializations={};
       var databases = {};
       var databaseOptions = [];
+      var databasePaths={};
       var keys = Object.keys(data);
-      keys.forEach(item=>{
+      keys.forEach(async item=>{
+        console.log(data[item]);
         initializations[item] = firebase.initializeApp(data[item],item);
         databases[item] = firebase.database(initializations[item])
         databaseOptions.push({ key: item, value: item, text: item })
+        await databases[item].ref('/').on("value", (snap) => {
+          const data = snap.val();
+          if(Object.keys(data).includes("Files")){
+            if(Object.keys(data["Files"]).includes("restrict_user")){
+              databasePaths[item] = 'Files/restrict_user'
+            }
+            else{
+              databasePaths[item] = 'Files/restrictUser'
+            }
+            
+          }
+          else{
+            databasePaths[item] = '/restrictUser'
+          }
+          this.setState({databasePaths:databasePaths})
+        })
       })
       this.setState({databaseOptions:databaseOptions,databases:databases})
     })
@@ -93,7 +113,7 @@ class App extends Component {
       if(this.state.name3 && this.state.mobile3)  data[this.state.name3]="+91"+this.state.mobile3
       if(this.state.name4 && this.state.mobile4)  data[this.state.name4]="+91"+this.state.mobile4
       if(this.state.name5 && this.state.mobile5)  data[this.state.name5]="+91"+this.state.mobile5
-      this.state.databases[this.state.database].ref('restrictUser').update(data).then(()=>{
+      this.state.databases[this.state.database].ref(this.state.databasePaths[this.state.database]).update(data).then(()=>{
         this.setState({dataAdded:true})
         setTimeout(()=>{this.setState({dataAdded:false})},1500)
       });
@@ -108,10 +128,8 @@ class App extends Component {
     {
       if(showUsers) this.setState({showUsers:!this.state.showUsers})
       var database;
-      this.state.databases[this.state.database].ref('/').on("value", (snap) => {
-        const data = snap.val();
-        var Users = data['data']
-        var restrictUser = data['restrictUser']
+      this.state.databases[this.state.database].ref(this.state.databasePaths[this.state.database]).on("value", (snap) => {
+        const restrictUser = snap.val();
         var restrictUserKeys = Object.keys(restrictUser)
         var arr = []
         restrictUserKeys.forEach(item => {
@@ -131,9 +149,11 @@ class App extends Component {
     this.setState({showUsers:!this.state.showUsers})
   }
   deleteUsers(name){
-    this.state.databases[this.state.database].ref('restrictUser').update({
-      [name]: null
-    });
+      this.state.databases[this.state.database].ref(this.state.databasePaths[this.state.database]).update({
+        [name]: null
+      });
+    
+    
   }
   filterMethod = (filter, row, column) => {
     const id = filter.pivotId || filter.id
