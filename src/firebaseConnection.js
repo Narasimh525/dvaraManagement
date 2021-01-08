@@ -3,17 +3,16 @@ import 'firebase/auth';
 import 'firebase/database';
 import 'firebase/storage';
 
-
-let firebaseConfig = {
-    apiKey: "AIzaSyBMwRNcspFOzmhV07bDMkmSsJFNPzFMaFQ",
-    authDomain: "dvara-third.firebaseapp.com",
-    databaseURL: "https://dvara-third-default-rtdb.firebaseio.com",
-    projectId: "dvara-third",
-    storageBucket: "dvara-third.appspot.com",
-    messagingSenderId: "517086250675",
-    appId: "1:517086250675:web:fcb781e45d75307ce0d2c6",
-    measurementId: "G-8MP0SGS15E"
-};
+var firebaseConfig = {
+    apiKey: "AIzaSyC0oNvv1ALFJTbT4jIE18lgduODPez9Fhw",
+    authDomain: "usermanagement-aa9ae.firebaseapp.com",
+    databaseURL: "https://usermanagement-aa9ae-default-rtdb.firebaseio.com",
+    projectId: "usermanagement-aa9ae",
+    storageBucket: "usermanagement-aa9ae.appspot.com",
+    messagingSenderId: "282646059046",
+    appId: "1:282646059046:web:dbc5381fcb5868d5082ee7",
+    measurementId: "G-2BEDVZ40GY"
+}
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
  }else {
