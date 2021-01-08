@@ -3,7 +3,7 @@ import React,{Component} from 'react';
 import firebase from '../firebaseConnection';
 import { Link } from 'react-router-dom';
 import deleteimag from '../images/deleteLogo1.png';
-import { Grid, Select , Input, Dropdown , Form , Button , Modal , Icon} from 'semantic-ui-react'
+import { Grid , Input, Dropdown , Form , Button  , Dimmer, Loader, Image, Segment} from 'semantic-ui-react'
 import ReactTable from 'react-table-v6'
 import { Events, animateScroll as scroll, scroller } from 'react-scroll';
 
@@ -38,6 +38,7 @@ class App extends Component {
       databaseOptions:[],
       mobileValidation:false,
       jsonFormatChange:false,
+      loader:true
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleChange1 = this.handleChange1.bind(this)
@@ -50,8 +51,7 @@ class App extends Component {
       var databaseOptions = [];
       var databasePaths={};
       var keys = Object.keys(data);
-      keys.forEach(async item=>{
-        console.log(data[item]);
+      keys.forEach(async (item, index, array)=>{
         initializations[item] = firebase.initializeApp(data[item],item);
         databases[item] = firebase.database(initializations[item])
         databaseOptions.push({ key: item, value: item, text: item })
@@ -60,6 +60,9 @@ class App extends Component {
           if(Object.keys(data).includes("Files")){
             if(Object.keys(data["Files"]).includes("restrict_user")){
               databasePaths[item] = 'Files/restrict_user'
+              if(item == "EDairy"){
+                this.setState({loader:false})
+              }
             }
             else{
               databasePaths[item] = 'Files/restrictUser'
@@ -254,17 +257,19 @@ class App extends Component {
     return (
       <div style={{backgroundColor:'#eee'}}>
         <TopHeader/>
-        <div  style={{margin:"1% 0% 2% 40%"}}>
-          <Dropdown
-            placeholder='Select Database'
-            // fluid
-            search
-            selection
-            options={this.state.databaseOptions}
-            name="database"
-            onChange={this.handleChange1}
-          />
-        </div>
+        {this.state.loader?<Loader style={{marginTop:"1%",marginBottom:'2%'}} active inline='centered' />:
+          <div  style={{margin:"1% 0% 2% 40%"}}>
+            <Dropdown
+              placeholder='Select Database'
+              // fluid
+              search
+              selection
+              options={this.state.databaseOptions}
+              name="database"
+              onChange={this.handleChange1}
+            />
+          </div>
+        }
         <Form style={{marginLeft:"30%"}} onSubmit={this.handleSubmit}>
           {inputs}
           { this.state.mobileValidation ?
