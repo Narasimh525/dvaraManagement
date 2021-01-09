@@ -3,7 +3,7 @@ import React,{Component} from 'react';
 import firebase from '../firebaseConnection';
 import { Link } from 'react-router-dom';
 import deleteimag from '../images/deleteLogo1.png';
-import { Grid , Input, Dropdown , Form , Button  , Dimmer, Loader, Image, Segment} from 'semantic-ui-react'
+import { Grid , Input, Confirm, Dropdown , Form , Button  , Dimmer, Loader, Image, Segment} from 'semantic-ui-react'
 import ReactTable from 'react-table-v6'
 import { Events, animateScroll as scroll, scroller } from 'react-scroll';
 
@@ -38,10 +38,12 @@ class App extends Component {
       databaseOptions:[],
       mobileValidation:false,
       jsonFormatChange:false,
-      loader:true
+      loader:false,
+      open:false
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleChange1 = this.handleChange1.bind(this)
+    this.show = this.show.bind(this)
   }
   componentDidMount = async() =>{
     database3.ref('/').on("value", (snap) => {
@@ -155,9 +157,12 @@ class App extends Component {
       this.state.databases[this.state.database].ref(this.state.databasePaths[this.state.database]).update({
         [name]: null
       });
-    
+      this.setState({ open : false })
     
   }
+  show = (rowName) => this.setState({ open : true,rowName:rowName});
+  handleConfirm = () => this.setState({ open : false});
+  handleCancel = () => this.setState({ open : false });
   filterMethod = (filter, row, column) => {
     const id = filter.pivotId || filter.id
     return row[id] !== undefined ? String(row[id].toLowerCase()).startsWith(filter.value.toLowerCase()) : true
@@ -239,7 +244,7 @@ class App extends Component {
           Header: "Action",
           Cell: ({row}) => (
             // <Button onClick = { () => this.deleteUsers(row.Name)} style = {{height:"10px",width:"10px"}}>
-              <img onClick = { () => this.deleteUsers(row.Name)} style = {{height:"20px",width:"20px",cursor:"pointer",marginLeft:"40%"}} src={deleteimag} /> 
+              <img onClick = { () => this.show(row.Name)} style = {{height:"20px",width:"20px",cursor:"pointer",marginLeft:"40%"}} src={deleteimag} /> 
             // </Button>
           ),
           headerStyle: {
@@ -324,7 +329,14 @@ class App extends Component {
               </Grid.Row>
               </Grid>
           :null}
-
+        <Confirm 
+            content ={"Are you sure want  to Delete :-"+this.state.rowName}
+            open = {this.state.open}
+            cancelButton = 'No'
+            confirmButton = "Yes"
+            onCancel = {this.handleCancel}
+            onConfirm = {()=>{this.deleteUsers(this.state.rowName)}}
+        />
       </div>
     )
     }
